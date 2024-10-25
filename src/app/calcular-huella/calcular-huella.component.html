@@ -91,7 +91,7 @@
             <tr>
                 <td><input id="producto" type="text" name="producto" [(ngModel)]="producto" /></td>
                 <td><input id="descripcion" type="text" name="descripcion" [(ngModel)]="descripcion" /></td>
-                <td>m<sup>3</sup></td>
+                <td>kg<sup></sup></td>
                 <td><input id="enero" type="number" name="enero" [(ngModel)]="enero" required /></td>
                 <td><input id="febrero" type="number" name="febrero" [(ngModel)]="febrero" required /></td>
                 <td><input id="marzo" type="number" name="marzo" [(ngModel)]="marzo" required /></td>
@@ -115,8 +115,6 @@
         <button class="btn btn-primary mt-3" (click)="nextStep()">Siguiente</button>
     </div>
 </div>
-
-
 
 <div *ngIf="currentStep == 3">
     <h3>Entradas de Agua</h3>
@@ -742,8 +740,15 @@
 
     <div class="col-md-12 text-center mt-4">
         <button class="btn btn-secondary me-2" (click)="previousStep()">Anterior</button>
-        <button class="btn btn-primary me-2" (click)="calcular()">Enviar</button>
-        <button class="btn btn-success" (click)="download()" [disabled]="!isLoggedIn">Descargar</button>
+        <!-- <button class="btn btn-primary me-2" (click)="calcular()">Enviar</button>
+        <button class="btn btn-success" (click)="download()" [disabled]="!isLoggedIn">Descargar</button> -->
+        <button class="btn" 
+        [ngClass]="isCalculationDone ? 'btn-success' : 'btn-primary'" 
+        (click)="handleClick()" 
+        [disabled]="isCalculationDone && !isLoggedIn">
+  {{ isCalculationDone ? 'Descargar' : 'Enviar' }}
+</button>
+
     </div>
     
 </div>

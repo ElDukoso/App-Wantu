@@ -200,59 +200,6 @@ export class GoogleSheetsService {
     }
   }
 
-
-
-  // async addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
-  //     // Asegúrate de que values sea un array de arrays
-  //     if (!Array.isArray(values) || !Array.isArray(values[0])) {
-  //         console.error('Invalid values format. It should be an array of arrays.');
-  //         return Promise.reject('Invalid values format. It should be an array of arrays.');
-  //     }
-  //     try {
-  //         console.log("Llega acá");
-
-  //         // Aquí es donde envías la petición a tu API
-  //         const response = await firstValueFrom(this.http.post('http://localhost:3000/api/guardar-datos', {
-  //             spreadsheetId: spreadsheetId,
-  //             range: range,
-  //             values: values
-  //         }));
-
-  //         console.log('Data saved successfully:', response);
-  //         return response; // Retorna la respuesta del servidor
-  //     } catch (error) {
-  //         console.error('Error saving data to sheet:', error);
-  //         return Promise.reject('Error saving data to sheet');
-  //     }
-  // }
-
-  // async addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
-  //   // Asegúrate de que values sea un array de arrays
-  //   if (!Array.isArray(values) || !Array.isArray(values[0])) {
-  //     console.error('Invalid values format. It should be an array of arrays.');
-  //     return Promise.reject('Invalid values format. It should be an array of arrays.');
-  //   }
-  //   try {
-  //     console.log("Enviando datos a la API:", {
-  //       spreadsheetId: spreadsheetId,
-  //       range: range,
-  //       values: values
-  //     }); // Log de datos
-
-  //     const response = await firstValueFrom(this.http.post('http://localhost:3000/api/guardar-datos', {
-  //       spreadsheetId: spreadsheetId,
-  //       range: range,
-  //       values: values
-  //   }));
-
-  //     console.log('Data saved successfully:', response);
-  //     return response; // Retorna la respuesta del servidor
-  //   } catch (error) {
-  //     console.error('Error saving data to sheet:', error);
-  //     return Promise.reject('Error saving data to sheet');
-  //   }
-  // }
-
   addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
     const body = {
       spreadsheetId,

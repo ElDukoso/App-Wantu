@@ -328,6 +328,7 @@ export class CalcularHuellaComponent {
     pentaclorofenolOctubre: number = 0;
     pentaclorofenolNoviembre: number = 0;
     pentaclorofenolDiciembre: number = 0;
+isCalculationDone: any;
     // Inyectar el servicio de Google Sheets en el constructor
     constructor(private googleSheetsService: GoogleSheetsService) { }
 
@@ -348,31 +349,31 @@ export class CalcularHuellaComponent {
     // Método para guardar los datos en Google Sheets
     guardarDatos() {
         this.guardarDatosHoja3();
-        // this.guardarDatosHoja4();
-        // this.guardarDatosHoja5();
-        // this.guardarDatosSalidaAgua();
-        // this.guardarDatosCalidadAgua();
+        this.guardarDatosHoja4();
+        this.guardarDatosHoja5();
+        this.guardarDatosSalidaAgua();
+        this.guardarDatosCalidadAgua();
     }
 
     // Método específico para guardar datos en Hoja 3
     private guardarDatosHoja3() {
         const rango = '3. INFORMACIÓN!B5:B18'; // El rango específico en la hoja 3
-        const valores = 
-            [this.medicionHuella, // B5
-            this.anioMedicion, // B6
-            this.unidadFuncional, // B7
-            "", // Saltar una fila
-            this.nombreEmpresa, // B9
-            this.instalacionMedida, // B10
-            this.ubicacionMedidaR, // B11
-            this.ubicacionMedidaC, // B12
-            this.tipoProducto, // B13
-            "", // Saltar otra fila
-            this.nombreResponsable, // B15
-            this.cargoResponsable, // B16
-            this.correoResponsable, // B17
-            this.telefonoResponsable // B18
-    ];
+        const valores = [
+            [this.medicionHuella], // B5
+            [this.anioMedicion], // B6
+            [this.unidadFuncional], // B7
+            [""], // Saltar una fila
+            [this.nombreEmpresa], // B9
+            [this.instalacionMedida], // B10
+            [this.ubicacionMedidaR], // B11
+            [this.ubicacionMedidaC], // B12
+            [this.tipoProducto], // B13
+            [""], // Saltar otra fila
+            [this.nombreResponsable], // B15
+            [this.cargoResponsable], // B16
+            [this.correoResponsable], // B17
+            [this.telefonoResponsable] // B18
+        ];
     
         this.googleSheetsService.addDataToSheet(this.spreadsheetId, rango, valores)
             .then((response: any) => {
@@ -965,12 +966,16 @@ export class CalcularHuellaComponent {
             });
     }
 
+    // 
     async calcular() {
         try {
             // Guarda los datos
             await this.guardarDatos();
             console.log('Datos guardados exitosamente. Ahora se habilitará el botón de descarga.');
-            this.isLoggedIn = true; // Actualiza el estado de autenticación
+            
+            // Actualiza el estado de autenticación y el estado del botón
+            this.isLoggedIn = true;
+            this.isCalculationDone = true; // Permite cambiar el texto del botón a "Descargar"
         } catch (error) {
             console.error('Error durante el proceso de guardado:', error);
         }
@@ -990,6 +995,7 @@ export class CalcularHuellaComponent {
                 '11. RESULTADOS HUELLA DIRECTA',
                 '12. RESUMEN HUELLA DIRECTA'
             ];
+            
             this.googleSheetsService.downloadExcel(selectedSheets)
                 .then(() => {
                     console.log('Descarga de hojas seleccionadas completada.');
@@ -1002,49 +1008,13 @@ export class CalcularHuellaComponent {
         }
     }
     
-
-    // calcular() {
-    //     this.googleSheetsService.handleAuthClick()
-    //         .then(() => {
-    //             console.log('Usuario autenticado, ahora se guardarán los datos.');
+    handleClick() {
+        if (!this.isCalculationDone) {
+            this.calcular();
+        } else {
+            this.download();
+        }
+    }
     
-    //             // Después de autenticar, guarda los datos
-    //             return this.guardarDatos();
-    //         })
-    //         .then(() => {
-    //             console.log('Datos guardados exitosamente. Ahora se habilitará el botón de descarga.');
-    //             this.isLoggedIn = true; // Actualiza el estado de autenticación
-    //             this.guardarDatos();
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error durante el proceso de autenticación o guardado:', error);
-    //         });
-    // }
-    
-    //   download() {
-    //     if (this.isLoggedIn) {
-    //       const selectedSheets = [
-    //         '3. INFORMACIÓN',
-    //         '4. PRODUCCIÓN',
-    //         '5. USO DIRECTO DE AGUA',
-    //         '6. DESCRIPCIÓN',
-    //         '7. CALIDAD DE AGUA',
-    //         '8. INDICADORES EVALUADOS',
-    //         '9. EMISIÓN CONTAMINANTES',
-    //         '10. FC INDICADORES',
-    //         '11. RESULTADOS HUELLA DIRECTA',
-    //         '12. RESUMEN HUELLA DIRECTA'
-    //       ];
-    //       this.googleSheetsService.downloadExcel(selectedSheets)
-    //         .then(() => {
-    //           console.log('Descarga de hojas seleccionadas completada.');
-    //         })
-    //         .catch((error: any) => {
-    //           console.error('Error al descargar las hojas seleccionadas:', error);
-    //         });
-    //     } else {
-    //       console.error('El usuario no está autenticado. No se puede descargar.');
-    //     }
-    //   }      
 }
 
