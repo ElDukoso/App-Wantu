@@ -1,6 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as XLSX from 'xlsx';
+import { firstValueFrom } from 'rxjs';
+
 
 declare var gapi: any;
 declare var google: any;
@@ -8,6 +11,7 @@ declare var google: any;
   providedIn: 'root'
 })
 export class GoogleSheetsService {
+
   downloadSelectedSheets(selectedSheets: string[]): any {
     throw new Error('Method not implemented.');
   }
@@ -17,14 +21,13 @@ export class GoogleSheetsService {
   private SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
   public spreadsheetId = '1f1j-yBgvjxgeeIb6cDCrd3ucaV1cejKjsKkzs_B99BM';
 
-
   private tokenClient: any;
   private gapiInited = false;
   private gisInited = false;
 
   public authStatus = new BehaviorSubject<boolean>(false);
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.loadGapi();
     this.loadGis();
   }
@@ -33,48 +36,31 @@ export class GoogleSheetsService {
     const workbook = XLSX.utils.book_new(); // Crea un nuevo libro de trabajo
 
     try {
-        for (const sheetName of selectedSheets) {
-            // Obtén los datos de cada hoja (asumiendo que los datos son una matriz de arrays)
-            const data: (string | number)[][] = await this.getRecords(this.spreadsheetId, sheetName);
+      for (const sheetName of selectedSheets) {
+        // Obtén los datos de cada hoja
+        const data = await this.getRecords(this.spreadsheetId, sheetName);
 
-            // Convierte los datos en una hoja de trabajo
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
+        // Convierte los datos en una hoja de trabajo
+        const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-            // Ajusta el ancho de las columnas en función de los datos
-            const columnWidths = data.reduce((widths, row) => {
-                row.forEach((cell, colIndex) => {
-                    const cellLength = cell ? cell.toString().length : 0;
-                    if (!widths[colIndex] || cellLength > widths[colIndex].wch) {
-                        widths[colIndex] = { wch: cellLength + 2 }; // Agrega un poco de espacio extra
-                    }
-                });
-                return widths;
-            }, [] as Array<{ wch: number }>); // Inicia el array de anchos
+        // Agrega la hoja de trabajo al libro
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      }
 
-            // Asigna los anchos de columna a la hoja
-            worksheet['!cols'] = columnWidths;
+      // Genera el archivo Excel y permite su descarga
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
 
-            // Agrega la hoja de trabajo al libro
-            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-        }
-
-        // Genera el archivo Excel y permite su descarga
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
-        // Crea un enlace de descarga y haz clic en él programáticamente
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'Datos_Google_Sheets.xlsx';
-        link.click();
+      // Crea un enlace de descarga y haz clic en él programáticamente
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'Datos_Google_Sheets.xlsx';
+      link.click();
 
     } catch (error) {
-        console.error('Error al descargar los datos:', error);
+      console.error('Error al descargar los datos:', error);
     }
-}
-
-
-
+  }
 
   private loadGapi() {
     const script = document.createElement('script');
@@ -213,27 +199,76 @@ export class GoogleSheetsService {
       console.error('Error al escribir datos en la hoja de cálculo:', error);
     }
   }
-  addDataToSheet(range: string, values: any[]) {
-    const token = gapi.client.getToken();
 
-    if (!token) {
-      console.error('No token found. Please authenticate first.');
-      return Promise.reject('No token found. Please authenticate first.');
-    }
 
-    // Asegúrate de que values sea un array de arrays
-    if (!Array.isArray(values) || !Array.isArray(values[0])) {
-      console.error('Invalid values format. It should be an array of arrays.');
-      return Promise.reject('Invalid values format. It should be an array of arrays.');
-    }
 
-    return gapi.client.sheets.spreadsheets.values.update({
-      spreadsheetId: this.spreadsheetId,
-      range: range,
-      valueInputOption: 'RAW',
-      resource: {
-        values: values,
-      },
-    });
+  // async addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
+  //     // Asegúrate de que values sea un array de arrays
+  //     if (!Array.isArray(values) || !Array.isArray(values[0])) {
+  //         console.error('Invalid values format. It should be an array of arrays.');
+  //         return Promise.reject('Invalid values format. It should be an array of arrays.');
+  //     }
+  //     try {
+  //         console.log("Llega acá");
+
+  //         // Aquí es donde envías la petición a tu API
+  //         const response = await firstValueFrom(this.http.post('http://localhost:3000/api/guardar-datos', {
+  //             spreadsheetId: spreadsheetId,
+  //             range: range,
+  //             values: values
+  //         }));
+
+  //         console.log('Data saved successfully:', response);
+  //         return response; // Retorna la respuesta del servidor
+  //     } catch (error) {
+  //         console.error('Error saving data to sheet:', error);
+  //         return Promise.reject('Error saving data to sheet');
+  //     }
+  // }
+
+  // async addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
+  //   // Asegúrate de que values sea un array de arrays
+  //   if (!Array.isArray(values) || !Array.isArray(values[0])) {
+  //     console.error('Invalid values format. It should be an array of arrays.');
+  //     return Promise.reject('Invalid values format. It should be an array of arrays.');
+  //   }
+  //   try {
+  //     console.log("Enviando datos a la API:", {
+  //       spreadsheetId: spreadsheetId,
+  //       range: range,
+  //       values: values
+  //     }); // Log de datos
+
+  //     const response = await firstValueFrom(this.http.post('http://localhost:3000/api/guardar-datos', {
+  //       spreadsheetId: spreadsheetId,
+  //       range: range,
+  //       values: values
+  //   }));
+
+  //     console.log('Data saved successfully:', response);
+  //     return response; // Retorna la respuesta del servidor
+  //   } catch (error) {
+  //     console.error('Error saving data to sheet:', error);
+  //     return Promise.reject('Error saving data to sheet');
+  //   }
+  // }
+
+  addDataToSheet(spreadsheetId: string, range: string, values: any[]) {
+    const body = {
+      spreadsheetId,
+      range,
+      values
+    };
+    return this.http.post('http://localhost:3000/api/guardar-datos', body)
+      .toPromise()
+      .then(response => {
+        console.log('Datos guardados:', response);
+        return response;
+      })
+      .catch(error => {
+        console.error('Error al guardar los datos:', error);
+        throw error; // Re-lanza el error para manejarlo en la llamada
+      });
   }
+
 }

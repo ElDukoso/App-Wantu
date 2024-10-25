@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { GoogleSheetsService } from '../services/google-sheets.service';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
     selector: 'app-calcular-huella',
     standalone: true,
@@ -10,9 +11,11 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './calcular-huella.component.html',
     styleUrls: ['./calcular-huella.component.css'],
 })
+
 export class CalcularHuellaComponent {
     currentStep: number = 1;
     isLoggedIn: boolean = false;
+    private spreadsheetId: string = '1f1j-yBgvjxgeeIb6cDCrd3ucaV1cejKjsKkzs_B99BM';
 
     // Datos de la medición de huella
     medicionHuella: string = '';
@@ -345,37 +348,33 @@ export class CalcularHuellaComponent {
     // Método para guardar los datos en Google Sheets
     guardarDatos() {
         this.guardarDatosHoja3();
-        this.guardarDatosHoja4();
-        this.guardarDatosHoja5();
-        this.guardarDatosSalidaAgua();
-        this.guardarDatosCalidadAgua();
-
-
-        // Reiniciar el formulario después de guardar los datos
-
+        // this.guardarDatosHoja4();
+        // this.guardarDatosHoja5();
+        // this.guardarDatosSalidaAgua();
+        // this.guardarDatosCalidadAgua();
     }
 
     // Método específico para guardar datos en Hoja 3
     private guardarDatosHoja3() {
         const rango = '3. INFORMACIÓN!B5:B18'; // El rango específico en la hoja 3
-        const valores = [
-            [this.medicionHuella], // B5
-            [this.anioMedicion], // B6
-            [this.unidadFuncional], // B7
-            [""], // Saltar una fila
-            [this.nombreEmpresa], // B9
-            [this.instalacionMedida], // B10
-            [this.ubicacionMedidaR], // B11
-            [this.ubicacionMedidaC], // B12
-            [this.tipoProducto], // B13
-            [""], // Saltar otra fila
-            [this.nombreResponsable], // B15
-            [this.cargoResponsable], // B16
-            [this.correoResponsable], // B17
-            [this.telefonoResponsable], // B18
-        ];
-
-        this.googleSheetsService.addDataToSheet(rango, valores)
+        const valores = 
+            [this.medicionHuella, // B5
+            this.anioMedicion, // B6
+            this.unidadFuncional, // B7
+            "", // Saltar una fila
+            this.nombreEmpresa, // B9
+            this.instalacionMedida, // B10
+            this.ubicacionMedidaR, // B11
+            this.ubicacionMedidaC, // B12
+            this.tipoProducto, // B13
+            "", // Saltar otra fila
+            this.nombreResponsable, // B15
+            this.cargoResponsable, // B16
+            this.correoResponsable, // B17
+            this.telefonoResponsable // B18
+    ];
+    
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId, rango, valores)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 3:', response);
             })
@@ -383,7 +382,7 @@ export class CalcularHuellaComponent {
                 console.error('Error al guardar los datos en Hoja 3:', error);
             });
     }
-
+    
     // Método específico para guardar datos en Hoja 4
     private guardarDatosHoja4() {
         const rango = '4. PRODUCCIÓN!A6:O6'; // Rango que cubre de A6 a N6 en una sola operación
@@ -407,7 +406,7 @@ export class CalcularHuellaComponent {
             ]
         ];
 
-        this.googleSheetsService.addDataToSheet(rango, valores)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rango, valores)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 4:', response);
             })
@@ -481,7 +480,7 @@ export class CalcularHuellaComponent {
         ];
 
         // Guardar en la Hoja 5 - Entrada Mensual de Agua Potable
-        this.googleSheetsService.addDataToSheet(rangoAguaPotable, valoresAguaPotable)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoAguaPotable, valoresAguaPotable)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua Potable:', response);
             })
@@ -490,7 +489,7 @@ export class CalcularHuellaComponent {
             });
 
         // Guardar en la Hoja 5 - Entrada Mensual de Agua de Pozo
-        this.googleSheetsService.addDataToSheet(rangoAguaPozo, valoresAguaPozo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoAguaPozo, valoresAguaPozo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua de Pozo:', response);
             })
@@ -499,7 +498,7 @@ export class CalcularHuellaComponent {
             });
 
         // Guardar en la Hoja 5 - Entrada Mensual de Agua Dulce de Fuentes Superficiales
-        this.googleSheetsService.addDataToSheet(rangoAguaSuperficial, valoresAguaSuperficial)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoAguaSuperficial, valoresAguaSuperficial)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua Superficial:', response);
             })
@@ -571,7 +570,7 @@ export class CalcularHuellaComponent {
         ];
 
         // Guardar en la Hoja 5 - Salida Mensual de Agua Descargada
-        this.googleSheetsService.addDataToSheet(rangoSalidaAguaDescargada, valoresSalidaAguaDescargada)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoSalidaAguaDescargada, valoresSalidaAguaDescargada)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua Descargada:', response);
             })
@@ -580,7 +579,7 @@ export class CalcularHuellaComponent {
             });
 
         // Guardar en la Hoja 5 - Salida Mensual de Agua Infiltrada
-        this.googleSheetsService.addDataToSheet(rangoSalidaAguaInfiltrada, valoresSalidaAguaInfiltrada)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoSalidaAguaInfiltrada, valoresSalidaAguaInfiltrada)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua Infiltrada:', response);
             })
@@ -589,7 +588,7 @@ export class CalcularHuellaComponent {
             });
 
         // Guardar en la Hoja 5 - Salida Mensual de Agua Dulce de Fuentes Superficiales
-        this.googleSheetsService.addDataToSheet(rangoSalidaAguaSuperficial, valoresSalidaAguaSuperficial)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoSalidaAguaSuperficial, valoresSalidaAguaSuperficial)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 5 - Agua Superficial:', response);
             })
@@ -617,7 +616,7 @@ export class CalcularHuellaComponent {
             ]
         ];
         // Guardar en la Hoja 7 
-        this.googleSheetsService.addDataToSheet(rangoNitrogeno, valoresNitrogeno)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoNitrogeno, valoresNitrogeno)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -644,7 +643,7 @@ export class CalcularHuellaComponent {
         ];
 
         // Guardar en la Hoja 7 
-        this.googleSheetsService.addDataToSheet(rangoNitrogenoKjeldahl, valoresNitrogenoKjeldahl)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoNitrogenoKjeldahl, valoresNitrogenoKjeldahl)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -669,7 +668,7 @@ export class CalcularHuellaComponent {
             ]
         ];
         // Guardar en la Hoja 7 
-        this.googleSheetsService.addDataToSheet(rangoFosforo, valoresFosforo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoFosforo, valoresFosforo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -693,7 +692,7 @@ export class CalcularHuellaComponent {
                 this.fosfatoDiciembre, // O9
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoFosfato, valoresFosfato)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoFosfato, valoresFosfato)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -717,7 +716,7 @@ export class CalcularHuellaComponent {
                 this.dqoDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoDqo, valoresDqo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoDqo, valoresDqo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -741,7 +740,7 @@ export class CalcularHuellaComponent {
                 this.dboDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoDbo, valoresDbo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoDbo, valoresDbo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -765,7 +764,7 @@ export class CalcularHuellaComponent {
                 this.arsenicoDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoArsenico, valoresArsenico)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoArsenico, valoresArsenico)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -789,7 +788,7 @@ export class CalcularHuellaComponent {
                 this.cadmioDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoCadmio, valoresCadmio)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoCadmio, valoresCadmio)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -813,7 +812,7 @@ export class CalcularHuellaComponent {
                 this.cromoDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoCromo, valoresCromo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoCromo, valoresCromo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -837,7 +836,7 @@ export class CalcularHuellaComponent {
                 this.cobreDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoCobre, valoresCobre)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoCobre, valoresCobre)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -861,7 +860,7 @@ export class CalcularHuellaComponent {
                 this.mercurioDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoMercurio, valoresMercurio)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoMercurio, valoresMercurio)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -885,7 +884,7 @@ export class CalcularHuellaComponent {
                 this.niquelDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoNiquel, valoresNiquel)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoNiquel, valoresNiquel)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -909,7 +908,7 @@ export class CalcularHuellaComponent {
                 this.plomoDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoPlomo, valoresPlomo)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoPlomo, valoresPlomo)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -933,7 +932,7 @@ export class CalcularHuellaComponent {
                 this.zincDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoZinc, valoresZinc)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoZinc, valoresZinc)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -957,7 +956,7 @@ export class CalcularHuellaComponent {
                 this.pentaclorofenolDiciembre,
             ]
         ];
-        this.googleSheetsService.addDataToSheet(rangoPentaclorofenol, valoresPentaclorofenol)
+        this.googleSheetsService.addDataToSheet(this.spreadsheetId,rangoPentaclorofenol, valoresPentaclorofenol)
             .then((response: any) => {
                 console.log('Datos guardados exitosamente en Hoja 7 - Calidad Agua', response);
             })
@@ -965,58 +964,87 @@ export class CalcularHuellaComponent {
                 console.error('Error al guardar los datos en Hoja 7 - Calidad Agua', error);
             });
     }
-    // Método para cálculos adicionales si es necesario
 
-    calcular() {
-        this.googleSheetsService.handleAuthClick()
-            .then(() => {
-                console.log('Usuario autenticado, ahora se guardarán los datos.');
-    
-                // Después de autenticar, guarda los datos
-                return this.guardarDatos();
-            })
-            .then(() => {
-                console.log('Datos guardados exitosamente. Ahora se habilitará el botón de descarga.');
-                this.isLoggedIn = true; // Actualiza el estado de autenticación
-                this.guardarDatos();
-            })
-            .catch((error) => {
-                console.error('Error durante el proceso de autenticación o guardado:', error);
-            });
+    async calcular() {
+        try {
+            // Guarda los datos
+            await this.guardarDatos();
+            console.log('Datos guardados exitosamente. Ahora se habilitará el botón de descarga.');
+            this.isLoggedIn = true; // Actualiza el estado de autenticación
+        } catch (error) {
+            console.error('Error durante el proceso de guardado:', error);
+        }
     }
     
-      download() {
-        // Si el usuario está autenticado, proceder a descargar las hojas seleccionadas
-        this.googleSheetsService.handleAuthClick()
-            .then(() => {
-                console.log('Usuario autenticado, ahora se guardarán los datos.');
-    
-                // Después de autenticar, guarda los datos
-                return this.guardarDatos();
-            })
+    download() {
         if (this.isLoggedIn) {
-          const selectedSheets = [
-            '3. INFORMACIÓN',
-            '4. PRODUCCIÓN',
-            '5. USO DIRECTO DE AGUA',
-            '6. DESCRIPCIÓN',
-            '7. CALIDAD DE AGUA',
-            '8. INDICADORES EVALUADOS',
-            '9. EMISIÓN CONTAMINANTES',
-            '10. FC INDICADORES',
-            '11. RESULTADOS HUELLA DIRECTA',
-            '12. RESUMEN HUELLA DIRECTA'
-          ];
-          this.googleSheetsService.downloadExcel(selectedSheets)
-            .then(() => {
-              console.log('Descarga de hojas seleccionadas completada.');
-            })
-            .catch((error: any) => {
-              console.error('Error al descargar las hojas seleccionadas:', error);
-            });
+            const selectedSheets = [
+                '3. INFORMACIÓN',
+                '4. PRODUCCIÓN',
+                '5. USO DIRECTO DE AGUA',
+                '6. DESCRIPCIÓN',
+                '7. CALIDAD DE AGUA',
+                '8. INDICADORES EVALUADOS',
+                '9. EMISIÓN CONTAMINANTES',
+                '10. FC INDICADORES',
+                '11. RESULTADOS HUELLA DIRECTA',
+                '12. RESUMEN HUELLA DIRECTA'
+            ];
+            this.googleSheetsService.downloadExcel(selectedSheets)
+                .then(() => {
+                    console.log('Descarga de hojas seleccionadas completada.');
+                })
+                .catch((error) => {
+                    console.error('Error al descargar las hojas seleccionadas:', error);
+                });
         } else {
-          console.error('El usuario no está autenticado. No se puede descargar.');
+            console.error('El usuario no está autenticado. No se puede descargar.');
         }
-      }      
+    }
+    
+
+    // calcular() {
+    //     this.googleSheetsService.handleAuthClick()
+    //         .then(() => {
+    //             console.log('Usuario autenticado, ahora se guardarán los datos.');
+    
+    //             // Después de autenticar, guarda los datos
+    //             return this.guardarDatos();
+    //         })
+    //         .then(() => {
+    //             console.log('Datos guardados exitosamente. Ahora se habilitará el botón de descarga.');
+    //             this.isLoggedIn = true; // Actualiza el estado de autenticación
+    //             this.guardarDatos();
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error durante el proceso de autenticación o guardado:', error);
+    //         });
+    // }
+    
+    //   download() {
+    //     if (this.isLoggedIn) {
+    //       const selectedSheets = [
+    //         '3. INFORMACIÓN',
+    //         '4. PRODUCCIÓN',
+    //         '5. USO DIRECTO DE AGUA',
+    //         '6. DESCRIPCIÓN',
+    //         '7. CALIDAD DE AGUA',
+    //         '8. INDICADORES EVALUADOS',
+    //         '9. EMISIÓN CONTAMINANTES',
+    //         '10. FC INDICADORES',
+    //         '11. RESULTADOS HUELLA DIRECTA',
+    //         '12. RESUMEN HUELLA DIRECTA'
+    //       ];
+    //       this.googleSheetsService.downloadExcel(selectedSheets)
+    //         .then(() => {
+    //           console.log('Descarga de hojas seleccionadas completada.');
+    //         })
+    //         .catch((error: any) => {
+    //           console.error('Error al descargar las hojas seleccionadas:', error);
+    //         });
+    //     } else {
+    //       console.error('El usuario no está autenticado. No se puede descargar.');
+    //     }
+    //   }      
 }
 
