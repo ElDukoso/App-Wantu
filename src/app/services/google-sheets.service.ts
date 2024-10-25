@@ -2,8 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as XLSX from 'xlsx';
-import { firstValueFrom } from 'rxjs';
-
 
 declare var gapi: any;
 declare var google: any;
@@ -36,31 +34,45 @@ export class GoogleSheetsService {
     const workbook = XLSX.utils.book_new(); // Crea un nuevo libro de trabajo
 
     try {
-      for (const sheetName of selectedSheets) {
-        // Obtén los datos de cada hoja
-        const data = await this.getRecords(this.spreadsheetId, sheetName);
+        for (const sheetName of selectedSheets) {
+            // Obtén los datos de cada hoja (asumiendo que los datos son una matriz de arrays)
+            const data: (string | number)[][] = await this.getRecords(this.spreadsheetId, sheetName);
 
-        // Convierte los datos en una hoja de trabajo
-        const worksheet = XLSX.utils.aoa_to_sheet(data);
+            // Convierte los datos en una hoja de trabajo
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
 
-        // Agrega la hoja de trabajo al libro
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-      }
+            // Ajusta el ancho de las columnas en función de los datos
+            const columnWidths = data.reduce((widths, row) => {
+                row.forEach((cell, colIndex) => {
+                    const cellLength = cell ? cell.toString().length : 0;
+                    if (!widths[colIndex] || cellLength > widths[colIndex].wch) {
+                        widths[colIndex] = { wch: cellLength + 2 }; // Agrega un poco de espacio extra
+                    }
+                });
+                return widths;
+            }, [] as Array<{ wch: number }>); // Inicia el array de anchos
 
-      // Genera el archivo Excel y permite su descarga
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+            // Asigna los anchos de columna a la hoja
+            worksheet['!cols'] = columnWidths;
 
-      // Crea un enlace de descarga y haz clic en él programáticamente
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = 'Datos_Google_Sheets.xlsx';
-      link.click();
+            // Agrega la hoja de trabajo al libro
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        }
+
+        // Genera el archivo Excel y permite su descarga
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+        // Crea un enlace de descarga y haz clic en él programáticamente
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'Datos_Google_Sheets.xlsx';
+        link.click();
 
     } catch (error) {
-      console.error('Error al descargar los datos:', error);
+        console.error('Error al descargar los datos:', error);
     }
-  }
+}
 
   private loadGapi() {
     const script = document.createElement('script');
