@@ -737,11 +737,13 @@
         </tbody>
     </table>
 
+    <div id="download-notification" class="notification hidden">
+        La descarga comenzará en breve...
+    </div>
+
 
     <div class="col-md-12 text-center mt-4">
         <button class="btn btn-secondary me-2" (click)="previousStep()">Anterior</button>
-        <!-- <button class="btn btn-primary me-2" (click)="calcular()">Enviar</button>
-        <button class="btn btn-success" (click)="download()" [disabled]="!isLoggedIn">Descargar</button> -->
         <button class="btn" 
         [ngClass]="isCalculationDone ? 'btn-success' : 'btn-primary'" 
         (click)="handleClick()" 

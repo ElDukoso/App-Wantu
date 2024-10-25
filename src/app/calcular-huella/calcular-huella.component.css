@@ -36,3 +36,26 @@ input {
     width: 80%; /* Ancho fijo para los campos de entrada */
     text-align: center; /* Alinear texto al centro */
 }
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    background-color: #4caf50; /* Fondo verde para indicar éxito */
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.hidden {
+    display: none;
+}
+

@@ -16,6 +16,8 @@ export class CalcularHuellaComponent {
     currentStep: number = 1;
     isLoggedIn: boolean = false;
     private spreadsheetId: string = '1f1j-yBgvjxgeeIb6cDCrd3ucaV1cejKjsKkzs_B99BM';
+    public isCalculationDone: boolean = false;
+    public isDownloading: boolean = false;
 
     // Datos de la medición de huella
     medicionHuella: string = '';
@@ -328,7 +330,7 @@ export class CalcularHuellaComponent {
     pentaclorofenolOctubre: number = 0;
     pentaclorofenolNoviembre: number = 0;
     pentaclorofenolDiciembre: number = 0;
-isCalculationDone: any;
+    // isCalculationDone: any;
     // Inyectar el servicio de Google Sheets en el constructor
     constructor(private googleSheetsService: GoogleSheetsService) { }
 
@@ -981,40 +983,61 @@ isCalculationDone: any;
         }
     }
     
-    download() {
-        if (this.isLoggedIn) {
-            const selectedSheets = [
-                '3. INFORMACIÓN',
-                '4. PRODUCCIÓN',
-                '5. USO DIRECTO DE AGUA',
-                '6. DESCRIPCIÓN',
-                '7. CALIDAD DE AGUA',
-                '8. INDICADORES EVALUADOS',
-                '9. EMISIÓN CONTAMINANTES',
-                '10. FC INDICADORES',
-                '11. RESULTADOS HUELLA DIRECTA',
-                '12. RESUMEN HUELLA DIRECTA'
-            ];
-            
-            this.googleSheetsService.downloadExcel(selectedSheets)
-                .then(() => {
-                    console.log('Descarga de hojas seleccionadas completada.');
-                })
-                .catch((error) => {
-                    console.error('Error al descargar las hojas seleccionadas:', error);
-                });
-        } else {
-            console.error('El usuario no está autenticado. No se puede descargar.');
-        }
-    }
-    
     handleClick() {
         if (!this.isCalculationDone) {
             this.calcular();
         } else {
-            this.download();
+            if (!this.isDownloading) {
+                this.isDownloading = true;  // Cambia el estado para evitar descargas múltiples
+                this.showDownloadMessage(); // Muestra el mensaje inicial
+                this.download();
+            }
         }
     }
     
+    showDownloadMessage() {
+        const notification = document.getElementById('download-notification');
+        if (notification) {
+            notification.classList.remove('hidden');
+            notification.classList.add('show');
+    
+            // Oculta el mensaje después de 3 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+    }
+
+    async download() {
+        try {
+            this.showDownloadMessage(); // Muestra el mensaje sin bloquear
+    
+            if (this.isLoggedIn) {
+                const selectedSheets = [
+                    '3. INFORMACIÓN',
+                    '4. PRODUCCIÓN',
+                    '5. USO DIRECTO DE AGUA',
+                    '6. DESCRIPCIÓN',
+                    '7. CALIDAD DE AGUA',
+                    '8. INDICADORES EVALUADOS',
+                    '9. EMISIÓN CONTAMINANTES',
+                    '10. FC INDICADORES',
+                    '11. RESULTADOS HUELLA DIRECTA',
+                    '12. RESUMEN HUELLA DIRECTA'
+                ];
+    
+                // Realiza la descarga de las hojas seleccionadas
+                await this.googleSheetsService.downloadExcel(selectedSheets);
+                console.log('Descarga de hojas seleccionadas completada.');
+            } else {
+                console.error('El usuario no está autenticado. No se puede descargar.');
+            }
+        } catch (error) {
+            console.error('Error al descargar las hojas seleccionadas:', error);
+        } finally {
+            this.isDownloading = false;  // Restaura el estado después de la descarga
+        }
+    }
 }
 
